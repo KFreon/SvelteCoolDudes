@@ -1,9 +1,10 @@
 <script lang=ts>
-	import type { CoolDude } from '$lib/dataService';
   export let title: string;
   import './styles.css'
 
-  export let dudes: CoolDude[];
+  export let afterDelete: () => Promise<void>;
+
+  export let dudes: any[];
 </script>
 
 <style>
@@ -32,11 +33,18 @@
   <ul>
     {#each dudes as dude}
     <li>
-      <form method="post" action="?/remove">
         <span>{dude.name} {dude.isCool ? '😎' : '😭'}</span>
         <input name="id" value={dude.id} style="display: none;"/>
-        <button type='submit'>X</button>  
-      </form>
+        <button type='button' on:click={async () => {
+          await fetch('http://localhost:5127/delete', {
+            method: 'DELETE',
+            body: JSON.stringify(dude.id),
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          })
+          await afterDelete();
+        }}>X</button>  
     </li>
     {/each}
   </ul>

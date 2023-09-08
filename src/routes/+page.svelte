@@ -2,13 +2,16 @@
 	import Modal from './Modal.svelte';
 	import PageColumn from './PageColumn.svelte';
   import './styles.css'
-
-  import {getAllDudes, type CoolDude} from '$lib/dataService';
-  import type {DataPayload} from './+page.server'
-
   let isVisible = false;
 
-  export let data: DataPayload; // server data
+	let dudes: any[] = [];
+
+	export async function loadDudes() {
+		const response = await fetch('http://localhost:5127/cooldudes');
+		dudes = await response.json();
+	}
+
+	loadDudes();
 </script>
 
 <nav>
@@ -21,9 +24,9 @@
 </div>
 
 <div class="main-area">
-	<PageColumn title="Cool Dudes 😎" dudes={data.dudes.filter(x => x.isCool)} />
+	<PageColumn title="Cool Dudes 😎" dudes={dudes.filter(x => x.isCool)} afterDelete={() => loadDudes()} />
 	<div style="width: 1px; border: 1px solid white;" />
-	<PageColumn title="Uncool Dudes 😭" dudes ={data.dudes.filter(x => !x.isCool)}/>
+	<PageColumn title="Uncool Dudes 😭" dudes ={dudes.filter(x => !x.isCool)} afterDelete={() => loadDudes()}/>
 </div>
 
 <Modal
@@ -32,7 +35,7 @@
 	bind:isVisible={isVisible}
 	placeholder="Your name"
 	submitButtonLabel="Add"
-	action='?/addnew'
+	afterSubmit={() => loadDudes()}
 />
 
 <style>
