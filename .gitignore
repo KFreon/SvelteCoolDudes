@@ -13,3 +13,4 @@ Backend/.vs
 **/bin
 **/obj
 **/*.csproj.user
+**/idea/
